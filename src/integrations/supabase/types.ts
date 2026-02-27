@@ -14,7 +14,144 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ads: {
+        Row: {
+          business_location: string | null
+          business_name: string
+          business_number: string | null
+          campaign_objective: string | null
+          created_at: string
+          currency: string | null
+          expires_at: string
+          hashtags: string | null
+          headline: string
+          id: string
+          image_url: string | null
+          industry: string | null
+          media_urls: string[] | null
+          negotiable: boolean | null
+          package_type: string
+          price: number | null
+          social_media: Json | null
+          status: string
+          subcategory: string | null
+          tags: string | null
+          target_age_max: number | null
+          target_age_min: number | null
+          target_location: string | null
+          updated_at: string
+          user_id: string
+          views: number | null
+        }
+        Insert: {
+          business_location?: string | null
+          business_name: string
+          business_number?: string | null
+          campaign_objective?: string | null
+          created_at?: string
+          currency?: string | null
+          expires_at: string
+          hashtags?: string | null
+          headline: string
+          id?: string
+          image_url?: string | null
+          industry?: string | null
+          media_urls?: string[] | null
+          negotiable?: boolean | null
+          package_type?: string
+          price?: number | null
+          social_media?: Json | null
+          status?: string
+          subcategory?: string | null
+          tags?: string | null
+          target_age_max?: number | null
+          target_age_min?: number | null
+          target_location?: string | null
+          updated_at?: string
+          user_id: string
+          views?: number | null
+        }
+        Update: {
+          business_location?: string | null
+          business_name?: string
+          business_number?: string | null
+          campaign_objective?: string | null
+          created_at?: string
+          currency?: string | null
+          expires_at?: string
+          hashtags?: string | null
+          headline?: string
+          id?: string
+          image_url?: string | null
+          industry?: string | null
+          media_urls?: string[] | null
+          negotiable?: boolean | null
+          package_type?: string
+          price?: number | null
+          social_media?: Json | null
+          status?: string
+          subcategory?: string | null
+          tags?: string | null
+          target_age_max?: number | null
+          target_age_min?: number | null
+          target_location?: string | null
+          updated_at?: string
+          user_id?: string
+          views?: number | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          business_location: string | null
+          business_name: string | null
+          business_number: string | null
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          business_location?: string | null
+          business_name?: string | null
+          business_number?: string | null
+          created_at?: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          business_location?: string | null
+          business_name?: string | null
+          business_number?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
