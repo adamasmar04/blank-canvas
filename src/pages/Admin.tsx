@@ -1,16 +1,14 @@
-import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate, Routes, Route } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
-import { TemplatesManager } from '@/components/admin/TemplatesManager';
-import { CategoriesManager } from '@/components/admin/CategoriesManager';
+import { AdsManager } from '@/components/admin/AdsManager';
+import { UsersManager } from '@/components/admin/UsersManager';
 import { AnalyticsDashboard } from '@/components/admin/AnalyticsDashboard';
-import { TeamManager } from '@/components/admin/TeamManager';
 import { SettingsManager } from '@/components/admin/SettingsManager';
 
 const Admin = () => {
-  const { isDesignerOrAbove, loading } = useAuth();
+  const { isAdmin, loading } = useAuth();
 
   if (loading) {
     return (
@@ -25,7 +23,7 @@ const Admin = () => {
     );
   }
 
-  if (!isDesignerOrAbove()) {
+  if (!isAdmin()) {
     return <Navigate to="/auth" replace />;
   }
 
@@ -33,10 +31,9 @@ const Admin = () => {
     <AdminLayout>
       <Routes>
         <Route index element={<AdminDashboard />} />
-        <Route path="templates" element={<TemplatesManager />} />
-        <Route path="categories" element={<CategoriesManager />} />
+        <Route path="ads" element={<AdsManager />} />
+        <Route path="users" element={<UsersManager />} />
         <Route path="analytics" element={<AnalyticsDashboard />} />
-        <Route path="team" element={<TeamManager />} />
         <Route path="settings" element={<SettingsManager />} />
       </Routes>
     </AdminLayout>

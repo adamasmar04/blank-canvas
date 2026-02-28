@@ -4,63 +4,69 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
-  Palette, 
+  Megaphone, 
   Users, 
   BarChart3, 
   TrendingUp,
-  FileImage,
-  Star,
-  Plus
+  Eye,
+  Plus,
+  Shield
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
 interface DashboardStats {
-  totalTemplates: number;
-  publishedTemplates: number;
-  pendingTemplates: number;
-  totalUsage: number;
-  topTemplate: { name: string; usage_count: number } | null;
+  totalAds: number;
+  activeAds: number;
+  pendingAds: number;
+  totalUsers: number;
+  totalViews: number;
 }
 
 export const AdminDashboard = () => {
-  const { userRole, isManagerOrAbove } = useAuth();
+  const { userRole } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats>({
-    totalTemplates: 0,
-    publishedTemplates: 0,
-    pendingTemplates: 0,
-    totalUsage: 0,
-    topTemplate: null
+    totalAds: 0,
+    activeAds: 0,
+    pendingAds: 0,
+    totalUsers: 0,
+    totalViews: 0
   });
+  const [recentAds, setRecentAds] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Fetch template stats
-        const { data: templates } = await supabase
-          .from('templates')
-          .select('status, usage_count, name');
+        // Fetch ads stats
+        const { data: ads } = await supabase
+          .from('ads')
+          .select('status, views');
 
-        if (templates) {
-          const totalTemplates = templates.length;
-          const publishedTemplates = templates.filter(t => t.status === 'published').length;
-          const pendingTemplates = templates.filter(t => t.status === 'pending').length;
-          const totalUsage = templates.reduce((sum, t) => sum + t.usage_count, 0);
-          
-          // Find most used template
-          const topTemplate = templates.reduce((top, current) => 
-            (current.usage_count > (top?.usage_count || 0)) ? current : top, null);
+        // Fetch user count
+        const { data: users } = await supabase
+          .from('user_roles')
+          .select('id');
 
+        // Fetch recent ads
+        const { data: recent } = await supabase
+          .from('ads')
+          .select('id, headline, business_name, status, views, created_at')
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        if (ads) {
           setStats({
-            totalTemplates,
-            publishedTemplates,
-            pendingTemplates,
-            totalUsage,
-            topTemplate
+            totalAds: ads.length,
+            activeAds: ads.filter(a => a.status === 'active').length,
+            pendingAds: ads.filter(a => a.status === 'pending').length,
+            totalUsers: users?.length || 0,
+            totalViews: ads.reduce((sum, a) => sum + (a.views || 0), 0)
           });
         }
+
+        setRecentAds(recent || []);
       } catch (error) {
         console.error('Error fetching dashboard stats:', error);
       } finally {
@@ -73,30 +79,30 @@ export const AdminDashboard = () => {
 
   const statCards = [
     {
-      title: 'Total Templates',
-      value: stats.totalTemplates,
-      icon: Palette,
+      title: 'Xayeysiisyada Guud',
+      value: stats.totalAds,
+      icon: Megaphone,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50 dark:bg-blue-950'
     },
     {
-      title: 'Published',
-      value: stats.publishedTemplates,
-      icon: FileImage,
+      title: 'Kuwa Firfircoon',
+      value: stats.activeAds,
+      icon: TrendingUp,
       color: 'text-green-600',
       bgColor: 'bg-green-50 dark:bg-green-950'
     },
     {
-      title: 'Pending Review',
-      value: stats.pendingTemplates,
-      icon: TrendingUp,
+      title: 'Sugitaanka',
+      value: stats.pendingAds,
+      icon: Eye,
       color: 'text-orange-600',
       bgColor: 'bg-orange-50 dark:bg-orange-950'
     },
     {
-      title: 'Total Usage',
-      value: stats.totalUsage,
-      icon: BarChart3,
+      title: 'Isticmaalayaasha',
+      value: stats.totalUsers,
+      icon: Users,
       color: 'text-purple-600',
       bgColor: 'bg-purple-50 dark:bg-purple-950'
     }
@@ -126,12 +132,13 @@ export const AdminDashboard = () => {
             Admin Dashboard
           </h1>
           <p className="text-muted-foreground">
-            Welcome back! Here's what's happening with your templates.
+            Ku soo dhawoow! Halkan waxaad ka arki kartaa xogta guud.
           </p>
         </div>
         
         {userRole && (
           <Badge variant="outline" className="text-sm">
+            <Shield className="h-3 w-3 mr-1" />
             {userRole.role.replace('_', ' ').toUpperCase()}
           </Badge>
         )}
@@ -158,84 +165,87 @@ export const AdminDashboard = () => {
         ))}
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Most Popular Template */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Star className="h-5 w-5 text-yellow-500" />
-              Most Used Template
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {stats.topTemplate ? (
-              <div className="space-y-2">
-                <p className="font-medium text-foreground">
-                  {stats.topTemplate.name}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Used {stats.topTemplate.usage_count} times
-                </p>
-              </div>
-            ) : (
-              <p className="text-muted-foreground">No templates used yet</p>
-            )}
-          </CardContent>
-        </Card>
+      {/* Total Views Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-muted-foreground" />
+            Aragtida Guud
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-4xl font-bold text-foreground">
+            {stats.totalViews.toLocaleString()}
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">
+            Tirada guud ee aragtida xayeysiisyada
+          </p>
+        </CardContent>
+      </Card>
 
-        {/* Quick Actions */}
+      {/* Quick Actions & Recent Ads */}
+      <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle>Ficilada Degdegga ah</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <Button 
               className="w-full justify-start" 
               variant="outline"
-              onClick={() => navigate('/admin/templates/create')}
+              onClick={() => navigate('/admin/ads')}
             >
-              <Plus className="mr-2 h-4 w-4" />
-              Create New Template
+              <Megaphone className="mr-2 h-4 w-4" />
+              Maaree Xayeysiisyada
             </Button>
             
             <Button 
               className="w-full justify-start" 
               variant="outline"
-              onClick={() => navigate('/admin/templates')}
+              onClick={() => navigate('/admin/users')}
             >
-              <Palette className="mr-2 h-4 w-4" />
-              Manage Templates
+              <Users className="mr-2 h-4 w-4" />
+              Maaree Isticmaalayaasha
             </Button>
-            
-            {isManagerOrAbove() && (
-              <Button 
-                className="w-full justify-start" 
-                variant="outline"
-                onClick={() => navigate('/admin/team')}
-              >
-                <Users className="mr-2 h-4 w-4" />
-                Manage Team
-              </Button>
+
+            <Button 
+              className="w-full justify-start" 
+              variant="outline"
+              onClick={() => navigate('/admin/analytics')}
+            >
+              <BarChart3 className="mr-2 h-4 w-4" />
+              Arag Analytics-ka
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Xayeysiisyada Ugu Dambeeyay</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {recentAds.length > 0 ? (
+              <div className="space-y-3">
+                {recentAds.map((ad) => (
+                  <div key={ad.id} className="flex items-center justify-between border-b pb-2 last:border-0">
+                    <div>
+                      <p className="font-medium text-sm text-foreground">{ad.headline}</p>
+                      <p className="text-xs text-muted-foreground">{ad.business_name}</p>
+                    </div>
+                    <Badge variant={ad.status === 'active' ? 'default' : 'secondary'}>
+                      {ad.status}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-4">
+                Wali ma jiraan xayeysiisyo
+              </p>
             )}
           </CardContent>
         </Card>
       </div>
-
-      {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">
-              Activity tracking will appear here once implemented
-            </p>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };
