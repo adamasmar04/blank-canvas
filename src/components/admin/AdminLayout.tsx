@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { 
   Home, 
-  Palette, 
-  FolderOpen, 
+  Megaphone, 
   BarChart3, 
   Users, 
   Settings, 
@@ -29,17 +28,16 @@ interface AdminLayoutProps {
 }
 
 export const AdminLayout = ({ children }: AdminLayoutProps) => {
-  const { user, userRole, signOut, isManagerOrAbove } = useAuth();
+  const { user, userRole, signOut } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navigation = [
-    { name: 'Overview', href: '/admin', icon: Home, show: true },
-    { name: 'Templates', href: '/admin/templates', icon: Palette, show: true },
-    { name: 'Categories', href: '/admin/categories', icon: FolderOpen, show: isManagerOrAbove() },
-    { name: 'Analytics', href: '/admin/analytics', icon: BarChart3, show: isManagerOrAbove() },
-    { name: 'Team', href: '/admin/team', icon: Users, show: isManagerOrAbove() },
-    { name: 'Settings', href: '/admin/settings', icon: Settings, show: isManagerOrAbove() },
+    { name: 'Guud ahaan', href: '/admin', icon: Home },
+    { name: 'Xayeysiisyada', href: '/admin/ads', icon: Megaphone },
+    { name: 'Isticmaalayaasha', href: '/admin/users', icon: Users },
+    { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+    { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 
   const getRoleColor = (role: string) => {
@@ -47,7 +45,6 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
       case 'super_admin': return 'bg-red-500';
       case 'admin': return 'bg-orange-500';
       case 'manager': return 'bg-blue-500';
-      case 'designer': return 'bg-green-500';
       default: return 'bg-gray-500';
     }
   };
@@ -59,12 +56,14 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
       </div>
       
       <nav className="flex-1 space-y-1 p-4">
-        {navigation.filter(item => item.show).map((item) => {
-          const isActive = location.pathname === item.href;
+        {navigation.map((item) => {
+          const isActive = location.pathname === item.href || 
+            (item.href !== '/admin' && location.pathname.startsWith(item.href));
           return (
             <NavLink
               key={item.name}
               to={item.href}
+              end={item.href === '/admin'}
               className={`flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                 isActive
                   ? 'bg-primary text-primary-foreground'
@@ -107,7 +106,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
           onClick={signOut}
         >
           <LogOut className="mr-2 h-4 w-4" />
-          Sign out
+          Ka bax
         </Button>
       </div>
     </div>
@@ -133,13 +132,9 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
       <div className="lg:pl-72">
         {/* Top Bar */}
         <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b bg-card px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-          </Sheet>
+          <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
+            <Menu className="h-5 w-5" />
+          </Button>
 
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
             <div className="flex flex-1"></div>
@@ -161,7 +156,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={signOut}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    Sign out
+                    Ka bax
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
